@@ -1,16 +1,14 @@
 #include <stdio.h>
 #include <float.h>
 #include <stdlib.h>
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#include "cap.h"
 
 double epsilon = 0.001;
 int default_max_iters = 400;
 int bound_max_iters = 800;
 
-
-struct Vector {
-    double *values;  
-    int clusterID;   
-};
 
 void initVector(struct Vector *v, int d) {
     v->values = (double *)malloc(d * sizeof(double));
@@ -25,15 +23,6 @@ double calculateDistance(struct Vector *p, struct Vector *q, int d) {
         sum += diff * diff;
     }
     return sum; 
-}
-
-void initialize_centroids(struct Vector *data, struct Vector *centroids, int D, int K) {
-   int i, j;
-   for(i = 0; i < K; i++) {
-       for(j = 0; j < D; j++) {
-           centroids[i].values[j] = data[i].values[j];
-       }
-   }
 }
 
 /* if data is 2 dimentional should it be int** data? */
@@ -104,15 +93,10 @@ int has_converged(struct Vector *old_centroids, struct Vector *centroids, int K,
    return 1;
 }
 
-struct Vector* solve(struct Vector *data, int N, int D, int K, int max_iters) {
+struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, int K, int max_iters) {
    int i, j, iter;
-   struct Vector* centroids = (struct Vector*) malloc(K * sizeof(struct Vector));
    struct Vector* old_centroids; /* Moved declaration to top */
 
-   for(i = 0; i < K; i++) {
-       initVector(&centroids[i], D);
-   }
-   initialize_centroids(data, centroids, D, K);
    for(iter = 1; iter < max_iters; iter++) {
        update_clasters(data, centroids, N, D, K);
        
@@ -143,111 +127,4 @@ void escape() {
     printf("An Error Has Occurred\n");
     exit(1);
 }
-int main(int argc, char *argv[]) {
-    struct Vector *points = NULL;
-    struct Vector *centroids = NULL; /* Moved declaration to top */
-    int capacity = 10;
-    int N = 0;
-    int d = 0;
-    int max_iters = default_max_iters;
-    int K = 0;
-    
-    /* Temporary variables for reading */
-    double val;
-    char sep;
-    int current_idx = 0;
-    int i, j;
-    int max_d = 10; /* Moved declaration to top */
-    int flag = 0;   /* Moved declaration to top */
-    
-    /* Allocation for the main array */
-    points = (struct Vector*)malloc(capacity * sizeof(struct Vector));
 
-    /* 1. Read the first vector separately to determine d */
-    points[0].values = NULL; 
-    points[0].clusterID = -1;
-    
-    points[0].values = (double*)malloc(max_d * sizeof(double));
-    while (scanf("%lf%c", &val, &sep) == 2) {
-        d++;
-        if(d == max_d){
-            max_d *= 2;
-            points[0].values = (double*)realloc(points[0].values, max_d * sizeof(double));
-        }
-        points[0].values[d-1] = val;
-
-        if (sep == '\n') break; 
-    }
-    N++;
-
-    while (1) {
-        if (N >= capacity) {
-            capacity *= 2;
-            points = (struct Vector*)realloc(points, capacity * sizeof(struct Vector));
-        }
-
-        points[N].values = (double*)malloc(d * sizeof(double));
-        points[N].clusterID = -1;
-
-        for (current_idx = 0; current_idx < d; current_idx++) {
-            if (scanf("%lf%c", &val, &sep) != 2) {
-                free(points[N].values);
-                flag = 1;
-                break;
-            }
-            points[N].values[current_idx] = val;
-        }
-        if(flag)break;
-        N++;
-    }    
-    if (argc > 1) {
-         K = atoi(argv[1]);
-        if (K <= 1 || K >= N) {
-            printf("Incorrect number of clusters!\n");
-            for (i = 0; i < N; i++) {
-               free(points[i].values);
-            }
-            free(points);
-            return 1;
-        }
-    }else{
-         for (i = 0; i < N; i++) {
-            free(points[i].values);
-         }
-         free(points);
-         escape();
-         return 1;
-    }
-    if(argc > 2){
-         max_iters = atoi(argv[2]);
-        if(max_iters <= 1 || max_iters >= bound_max_iters){
-            printf("Incorrect maximum iteration!\n");
-            for (i = 0; i < N; i++) {
-               free(points[i].values);
-            }
-            free(points);
-            return 1;
-        }
-    }
-    
-    centroids = solve(points, N, d, K, max_iters);
-    
-    for (i = 0; i < K; i++) {
-        for (j = 0; j < d; j++) {
-            printf("%.4f", centroids[i].values[j]);
-            if(j < d - 1){
-                printf(",");
-            }
-        }
-        
-        printf("\n");
-        free(centroids[i].values);
-    }
-    free(centroids);
-    for (i = 0; i < N; i++) {
-        free(points[i].values);
-    }
-    free(points);
-
-    return 0;
-}
