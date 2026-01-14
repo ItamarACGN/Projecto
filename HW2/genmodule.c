@@ -20,6 +20,35 @@ void initVector(struct Vector *v, int d) {
     v->values = (double *)malloc(d * sizeof(double));
     v->clusterID = -1;
 }
+
+static struct Vector* pyList_to_vectors (PyObject* points_obj)
+{
+    Py_ssize_t py_size = PyList_Size(points_obj);
+    int size = (int)py_size;
+    int dim = 0;
+    
+    struct Vector *points = malloc(sizeof(struct Vector) * size);
+    if (!points)
+    {
+        return NULL;
+    }
+    
+    for (int i = 0; i < size; i++){
+        PyObject* point_obj = PyList_GetItem(points_obj, i);
+        dim = PyList_Size(point_obj);
+
+        initVector(&points[i], dim);
+        points[i] = point;
+        for (int j = 0; j < dim; j++)
+        {
+            PyObject* item = PyList_GetItem(point_obj, j);
+            double val = PyFloat_AsDouble(item);
+            points[i].values[j] = val;
+        }
+    }
+    return points;
+}
+
 void free_vectors(struct Vector* vectors, int K) {
     for (int i = 0; i < K; i++) {
         free(vectors[i].values);
@@ -35,8 +64,8 @@ static PyObject* kmeans_capi(PyObject *self, PyObject *args)
     if(!PyArg_ParseTuple(args, "iiiiOO", &N, &D, &K, &max_iters, &data, &centroids)) {
         return NULL;
     }
-    struct Vector* data_vector = func(data);
-    struct Vector* centroids_vector = func(centroids);
+    struct Vector* data_vector = pyList_to_vectors(data);
+    struct Vector* centroids_vector = pyList_to_vectors(centroids);
     struct Vector* result_centroids = fit(data_vector, centroids_vector, N, D, K, max_iters);
 
     PyObject* result = list_of_vectors_to_pyobject(result_centroids, K, D);
