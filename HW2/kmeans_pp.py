@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 import numpy as np
-
+import capi_demo1 as mykmeanssp
 # Constants
 DEFAULT_ITER = 300
 MAX_ITER = 1000
@@ -145,9 +145,10 @@ if __name__ == "__main__":
     # Note: keys is a numpy array, keys[i] gets the original ID from the file
     chosen_keys = [str(int(keys[i])) for i in chosen_indices]
     print(",".join(chosen_keys))
-
+    final_centroids = mykmeanssp.kmeans(N, len(points[0]), k, iter_val, points.tolist(), points[chosen_indices].tolist())
+    print(final_centroids)
     # TODO: Connect to C Module
     # 1. Get initial centroids: initial_centroids = points[chosen_indices]
     # 2. Import mykmeanssp
     # 3. final_centroids = mykmeanssp.fit(k, iter_val, eps, initial_centroids.tolist(), points.tolist())
-    # 4. Print final_centroids
+    # 4. Print final_centroidsg
