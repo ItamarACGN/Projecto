@@ -16,10 +16,8 @@ static PyObject* list_of_vectors_to_pyobject(struct Vector* vectors, int K, int 
     }
     return py_list;
 }
-void initVector(struct Vector *v, int d) {
-    v->values = (double *)malloc(d * sizeof(double));
-    v->clusterID = -1;
-}
+
+
 
 static struct Vector* pyList_to_vectors (PyObject* points_obj)
 {
@@ -38,7 +36,7 @@ static struct Vector* pyList_to_vectors (PyObject* points_obj)
         dim = PyList_Size(point_obj);
 
         initVector(&points[i], dim);
-        points[i] = point;
+        
         for (int j = 0; j < dim; j++)
         {
             PyObject* item = PyList_GetItem(point_obj, j);

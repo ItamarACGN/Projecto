@@ -10,10 +10,12 @@ int default_max_iters = 400;
 int bound_max_iters = 800;
 
 
-void initVector(struct Vector *v, int d) {
-    v->values = (double *)malloc(d * sizeof(double));
-    v->clusterID = -1;
+void escape() {
+    printf("An Error Has Occurred\n");
+    exit(1);
 }
+
+
 
 double calculateDistance(struct Vector *p, struct Vector *q, int d) {
     double sum = 0.0;
@@ -24,13 +26,20 @@ double calculateDistance(struct Vector *p, struct Vector *q, int d) {
     }
     return sum; 
 }
-
+double initVector(struct Vector *v, int d) {
+    v->values = (double *)malloc(d * sizeof(double));
+    if (v->values == NULL) {
+        escape();
+    }
+    v->clusterID = -1;
+    return 0;
+}
 /* if data is 2 dimentional should it be int** data? */
 
 void update_clasters(struct Vector *data, struct Vector *centroids, int N, int D, int K) {
    int i, j;
    for(i = 0; i < N; i++) {
-       double min_distance = __DBL_MAX__;
+    double min_distance = DBL_MAX;
        int closest_centroid = -1;
        for(j = 0; j < K; j++) {
            double distance = calculateDistance(&data[i], &centroids[j], D);
@@ -123,8 +132,3 @@ struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, 
    }
    return centroids;
 }
-void escape() {
-    printf("An Error Has Occurred\n");
-    exit(1);
-}
-
