@@ -5,7 +5,7 @@
 #include <Python.h>
 #include "cap.h"
 
-double epsilon = 0.001;
+double epsilon;
 int default_max_iters = 400;
 int bound_max_iters = 800;
 
@@ -102,9 +102,10 @@ int has_converged(struct Vector *old_centroids, struct Vector *centroids, int K,
    return 1;
 }
 
-struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, int K, int max_iters) {
+struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, int K, int max_iters, double epsilon_val) {
    int i, j, iter;
    struct Vector* old_centroids; /* Moved declaration to top */
+   epsilon = epsilon_val;
 
    for(iter = 1; iter < max_iters; iter++) {
        update_clasters(data, centroids, N, D, K);
