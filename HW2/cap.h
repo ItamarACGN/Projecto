@@ -1,4 +1,4 @@
-# ifndef CAP_H_
+# define CAP_H_
 # define CAP_H_
 
 struct Vector {
