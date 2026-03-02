@@ -160,3 +160,16 @@ double matrix_hilbert_schmidt_norm(const Matrix *A) {
     
     return sqrt(sum_of_squares);
 }
+
+//print matrix for debugging
+void matrix_print(const Matrix *mat) {
+    if (mat == NULL || mat->data == NULL) {
+        return;
+    }    
+    for (int i = 0; i < mat->rows; i++) {
+        for (int j = 0; j < mat->cols; j++) {
+            printf("%lf ", matrix_get(mat, i, j));
+        }
+        printf("\n");
+    }
+}   
