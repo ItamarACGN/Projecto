@@ -1,135 +1,99 @@
 #include <stdio.h>
-#include <float.h>
 #include <stdlib.h>
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
-#include "cap.h"
 
-double epsilon;
-int default_max_iters = 400;
-int bound_max_iters = 800;
+typedef struct {
+    int rows;
+    int cols;
+    double *data;
+} Matrix;
 
-
-void escape() {
-    printf("An Error Has Occurred\n");
-    exit(1);
-}
-
-
-
-double calculateDistance(struct Vector *p, struct Vector *q, int d) {
-    double sum = 0.0;
-    int i;
-    for (i = 0; i < d; i++) {
-        double diff = p->values[i] - q->values[i];
-        sum += diff * diff;
+// Initialize a new matrix with zeros
+Matrix* matrix_create(int rows, int cols) {
+    Matrix *mat = (Matrix*)malloc(sizeof(Matrix));
+    if (mat == NULL) {
+        fprintf(stderr, "Failed to allocate memory for Matrix struct.\n");
+        return NULL;
     }
-    return sum; 
-}
-double initVector(struct Vector *v, int d) {
-    v->values = (double *)malloc(d * sizeof(double));
-    if (v->values == NULL) {
-        escape();
+    
+    mat->rows = rows;
+    mat->cols = cols;
+    // calloc initializes the memory to zero
+    mat->data = (double*)calloc(rows * cols, sizeof(double)); 
+    
+    if (mat->data == NULL) {
+        fprintf(stderr, "Failed to allocate memory for Matrix data.\n");
+        free(mat);
+        return NULL;
     }
-    v->clusterID = -1;
-    return 0;
-}
-/* if data is 2 dimentional should it be int** data? */
-
-void update_clasters(struct Vector *data, struct Vector *centroids, int N, int D, int K) {
-   int i, j;
-   for(i = 0; i < N; i++) {
-    double min_distance = DBL_MAX;
-       int closest_centroid = -1;
-       for(j = 0; j < K; j++) {
-           double distance = calculateDistance(&data[i], &centroids[j], D);
-           if(distance < min_distance) {
-               min_distance = distance;
-               closest_centroid = j;
-           }
-       }
-      data[i].clusterID = closest_centroid;
-   }
+    
+    return mat;
 }
 
-void update_centroids(struct Vector *data, struct Vector *centroids, int N, int D, int K) {
-   int i, j;
-   int* counts = (int*) calloc(K, sizeof(int));
-   for(i = 0; i < K; i++) {
-       for(j = 0; j < D; j++) {
-           centroids[i].values[j] = 0.0;
-       }
-   }
-   for(i = 0; i < N; i++) {
-       int clusterID = data[i].clusterID;
-       counts[clusterID]++;
-   }
-   for(i = 0; i < K; i++){
-         if(counts[i] == 0){
-            counts[data[0].clusterID]--;
-            counts[i]++;
-            data[0].clusterID = i;
-         }
-   }
-   for(i = 0; i < N; i++) {
-       int clusterID = data[i].clusterID;
-       for(j = 0; j < D; j++) {
-           centroids[clusterID].values[j] += data[i].values[j];
-       }
-   }
-   for(i = 0; i < K; i++) {
-       if(counts[i] > 0) {
-           for(j = 0; j < D; j++) {
-               centroids[i].values[j] /= counts[i];
-           }
-       }else{
-         for(j = 0; j < D; j++) {
-               centroids[i].values[j] = data[0].values[j];
-           }
-       }
-   }
-   free(counts);
+// Safely free the matrix memory
+void matrix_free(Matrix *mat) {
+    if (mat != NULL) {
+        if (mat->data != NULL) {
+            free(mat->data);
+        }
+        free(mat);
+    }
 }
 
-int has_converged(struct Vector *old_centroids, struct Vector *centroids, int K, int D) {
-   int i;
-   for(i = 0; i < K; i++) {
-       double distance = calculateDistance(&old_centroids[i], &centroids[i], D);
-       if(distance > epsilon * epsilon) {
-           return 0;
-       }
-   }
-   return 1;
-}
-
-struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, int K, int max_iters, double epsilon_val) {
-   int i, j, iter;
-   struct Vector* old_centroids; /* Moved declaration to top */
-   epsilon = epsilon_val;
-
-   for(iter = 1; iter < max_iters; iter++) {
-       update_clasters(data, centroids, N, D, K);
-       
-       /* copy old centroids for convergence check */
-       old_centroids = (struct Vector*) malloc(K * sizeof(struct Vector));
-       for(i = 0; i < K; i++) {
-           initVector(&old_centroids[i], D);
-           for(j = 0; j < D; j++) {
-               old_centroids[i].values[j] = centroids[i].values[j];
-           }
-       }
-       update_centroids(data, centroids, N, D, K);
-         if(has_converged(old_centroids, centroids, K, D)) {
-            for(i = 0; i < K; i++) {
-                  free(old_centroids[i].values);
+Matrix* matrix_multiply(const Matrix *A, const Matrix *B) {
+    // Check if dimensions are compatible for multiplication
+    if (A->cols != B->rows) {
+        fprintf(stderr, "Dimension mismatch: %dx%d cannot be multiplied with %dx%d.\n", 
+                A->rows, A->cols, B->rows, B->cols);
+        return NULL;
+    }
+    
+    // Create the resulting matrix (A->rows x B->cols)
+    Matrix *result = matrix_create(A->rows, B->cols);
+    if (result == NULL) return NULL;
+    
+    // Standard O(n^3) matrix multiplication
+    for (int i = 0; i < A->rows; i++) {
+        for (int j = 0; j < B->cols; j++) {
+            double sum = 0.0;
+            for (int k = 0; k < A->cols; k++) {
+                // A[i][k] * B[k][j]
+                double a_val = A->data[i * A->cols + k];
+                double b_val = B->data[k * B->cols + j];
+                sum += a_val * b_val;
             }
-            free(old_centroids);
-            break;
-         }
-         for(i = 0; i < K; i++) {
-            free(old_centroids[i].values);
-         }
-         free(old_centroids);
-   }
-   return centroids;
+            result->data[i * result->cols + j] = sum;
+        }
+    }
+    
+    return result;
+}
+
+Matrix* matrix_transpose(const Matrix *A) {
+    // The new matrix flips the rows and columns
+    Matrix *result = matrix_create(A->cols, A->rows);
+    if (result == NULL) return NULL;
+    
+    for (int i = 0; i < A->rows; i++) {
+        for (int j = 0; j < A->cols; j++) {
+            // result[j][i] = A[i][j]
+            result->data[j * result->cols + i] = A->data[i * A->cols + j];
+        }
+    }
+    
+    return result;
+}
+
+// Set a value at (row, col)
+void matrix_set(Matrix *mat, int row, int col, double value) {
+    if (row >= 0 && row < mat->rows && col >= 0 && col < mat->cols) {
+        mat->data[row * mat->cols + col] = value;
+    }
+}
+
+// Get a value at (row, col)
+double matrix_get(const Matrix *mat, int row, int col) {
+    if (row >= 0 && row < mat->rows && col >= 0 && col < mat->cols) {
+        return mat->data[row * mat->cols + col];
+    }
+    return 0.0; // Or handle out-of-bounds error
 }
