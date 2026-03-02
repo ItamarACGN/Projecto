@@ -97,3 +97,61 @@ double matrix_get(const Matrix *mat, int row, int col) {
     }
     return 0.0; // Or handle out-of-bounds error
 }
+
+// Matrix Addition: C = A + B
+Matrix* matrix_add(const Matrix *A, const Matrix *B) {
+    if (A->rows != B->rows || A->cols != B->cols) {
+        fprintf(stderr, "Dimension mismatch: %dx%d cannot be added to %dx%d.\n", 
+                A->rows, A->cols, B->rows, B->cols);
+        return NULL;
+    }
+    
+    Matrix *result = matrix_create(A->rows, A->cols);
+    if (result == NULL) return NULL;
+    
+    int total_elements = A->rows * A->cols;
+    
+    // Single loop optimization thanks to the 1D array structure
+    for (int i = 0; i < total_elements; i++) {
+        result->data[i] = A->data[i] + B->data[i];
+    }
+    
+    return result;
+}
+
+// Matrix Subtraction: C = A - B
+Matrix* matrix_subtract(const Matrix *A, const Matrix *B) {
+    if (A->rows != B->rows || A->cols != B->cols) {
+        fprintf(stderr, "Dimension mismatch: %dx%d cannot be subtracted from %dx%d.\n", 
+                A->rows, A->cols, B->rows, B->cols);
+        return NULL;
+    }
+    
+    Matrix *result = matrix_create(A->rows, A->cols);
+    if (result == NULL) return NULL;
+    
+    int total_elements = A->rows * A->cols;
+    
+    for (int i = 0; i < total_elements; i++) {
+        result->data[i] = A->data[i] - B->data[i];
+    }
+    
+    return result;
+}
+
+#include <math.h>
+
+// Calculate the Hilbert-Schmidt (Frobenius) norm of the matrix
+double matrix_hilbert_schmidt_norm(const Matrix *A) {
+    if (A == NULL || A->data == NULL) return 0.0;
+    
+    double sum_of_squares = 0.0;
+    int total_elements = A->rows * A->cols;
+    
+    for (int i = 0; i < total_elements; i++) {
+        double val = A->data[i];
+        sum_of_squares += val * val;
+    }
+    
+    return sqrt(sum_of_squares);
+}
