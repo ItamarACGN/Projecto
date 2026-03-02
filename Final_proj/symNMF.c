@@ -88,14 +88,15 @@ int main(int argc, char *argv[]) {
 
 
 Matrix * update_H (Matrix * curr_H, Matrix * W){
+    int i,j;
     Matrix * next_H = matrix_create(curr_H -> rows, curr_H -> cols);
     double beta = 0.5;
     Matrix * WH = matrix_multiply(W, curr_H);
     Matrix * denominator = matrix_multiply( curr_H, matrix_transpose(curr_H));
     denominator = matrix_multiply(denominator, curr_H);
 
-    for (int i = 0; i < curr_H -> rows; i++){
-        for (int j = 0; j < curr_H -> cols; j++){
+    for (i = 0; i < curr_H -> rows; i++){
+        for (j = 0; j < curr_H -> cols; j++){
             double val = 1 - beta + beta * (matrix_get(WH, i, j) / matrix_get(denominator, i, j));
             matrix_set(next_H, i, j, matrix_get(curr_H, i, j) * val);
         }
@@ -106,8 +107,9 @@ Matrix * update_H (Matrix * curr_H, Matrix * W){
 }
 
 Matrix * optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon){
+    int iter;
     Matrix * curr_H = H;
-    for (int iter = 0; iter < max_iters; iter++){
+    for (iter = 0; iter < max_iters; iter++){
         Matrix * next_H = update_H(curr_H, W);
         double diff = matrix_hilbert_schmidt_norm(matrix_subtract(next_H, curr_H));
         if (diff < epsilon){
