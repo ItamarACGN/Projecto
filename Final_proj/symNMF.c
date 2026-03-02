@@ -2,11 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <string.h>
 
 Matrix* sym(struct Vector *v, int n, int d){
     int i,j;
-    Matrix *result = matrix_create(n, n);
+    Matrix *result;
+    result = matrix_create(n, n);
     if (result == NULL) return NULL;
     
     for ( i = 0; i < n; i++) {
@@ -24,8 +25,9 @@ Matrix* sym(struct Vector *v, int n, int d){
 
 Matrix* ddg(struct Vector *v, int n, int d){
     int i,j;
-    Matrix *result = matrix_create(n, n);
-    Matrix *symMatrix = sym(v, n, d);
+    Matrix *result, *symMatrix;
+    result = matrix_create(n, n);
+    symMatrix = sym(v, n, d);
     if (result == NULL || symMatrix == NULL) {
         matrix_free(result);
         matrix_free(symMatrix);
@@ -44,10 +46,14 @@ Matrix* ddg(struct Vector *v, int n, int d){
 
 Matrix* norm(struct Vector *v, int n, int d){
     int i;
-    Matrix *symMatrix = sym(v, n, d);
+    Matrix *normMatrix;
+    Matrix *temp;
+    Matrix *ddgMatrix;
+    Matrix *symMatrix;
+    symMatrix = sym(v, n, d);
     if (symMatrix == NULL) return NULL;
     
-    Matrix *ddgMatrix = ddg(v, n, d);
+    ddgMatrix = ddg(v, n, d);
     if (ddgMatrix == NULL) {
         matrix_free(symMatrix);
         return NULL;
@@ -55,13 +61,13 @@ Matrix* norm(struct Vector *v, int n, int d){
     for(i = 0; i < n; i++){
         ddgMatrix->data[i * n + i] = 1.0 / sqrt(ddgMatrix->data[i * n + i]);
     }
-    Matrix *temp = matrix_multiply(ddgMatrix, symMatrix);
+    temp = matrix_multiply(ddgMatrix, symMatrix);
     if (temp == NULL) {
         matrix_free(symMatrix);
         matrix_free(ddgMatrix);
         return NULL;
     }
-    Matrix *normMatrix = matrix_multiply(temp, ddgMatrix);
+    normMatrix = matrix_multiply(temp, ddgMatrix);
     if (normMatrix == NULL) {
         matrix_free(symMatrix);
         matrix_free(ddgMatrix);
@@ -77,27 +83,19 @@ Matrix* norm(struct Vector *v, int n, int d){
     return normMatrix;
 }
 
-
-int main(int argc, char *argv[]) {
-    if(argc != 2) {
-        fprintf(stderr, "An error has occurred\n");
-        exit(1);
-    }
-
-}
-
-
 Matrix * update_H (Matrix * curr_H, Matrix * W){
     int i,j;
-    Matrix * next_H = matrix_create(curr_H -> rows, curr_H -> cols);
-    double beta = 0.5;
-    Matrix * WH = matrix_multiply(W, curr_H);
-    Matrix * denominator = matrix_multiply( curr_H, matrix_transpose(curr_H));
+    double beta,val;
+    Matrix * next_H, * WH, * denominator;
+    next_H = matrix_create(curr_H -> rows, curr_H -> cols);
+    beta = 0.5;
+    WH = matrix_multiply(W, curr_H);
+    denominator = matrix_multiply( curr_H, matrix_transpose(curr_H));
     denominator = matrix_multiply(denominator, curr_H);
 
     for (i = 0; i < curr_H -> rows; i++){
         for (j = 0; j < curr_H -> cols; j++){
-            double val = 1 - beta + beta * (matrix_get(WH, i, j) / matrix_get(denominator, i, j));
+            val = 1 - beta + beta * (matrix_get(WH, i, j) / matrix_get(denominator, i, j));
             matrix_set(next_H, i, j, matrix_get(curr_H, i, j) * val);
         }
     }
@@ -123,11 +121,109 @@ Matrix * optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon){
     return curr_H;
 }
 
-int main(int argc, char *argv[]) {
-    if(argc != 2) {
-        fprintf(stderr, "An error has occurred\n");
+struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
+    int rows = 0;
+    int cols = 0;
+    double val;
+    int c;
+    int i, j;
+    FILE *f;
+    struct Vector *v;
+
+    f = fopen(file_name, "r");
+    if (f == NULL) {
+        printf("An Error Has Occurred\n");
         exit(1);
     }
 
+    while (fscanf(f, "%lf", &val) == 1) {
+        if (rows == 0) {
+            cols++;
+        }
+        c = fgetc(f);
+        if (c == '\n') {
+            rows++;
+        } else if (c == EOF) {
+            rows++;
+            break;
+        }
+    }
+
+    *n_out = rows;
+    *d_out = cols;
+
+    v = (struct Vector*)malloc(rows * sizeof(struct Vector));
+    if (v == NULL) {
+        printf("An Error Has Occurred\n");
+        fclose(f);
+        exit(1);
+    }
+
+    rewind(f);
+
+    for (i = 0; i < rows; i++) {
+        v[i].values = (double*)malloc(cols * sizeof(double));
+        
+        if (v[i].values == NULL) {
+            printf("An Error Has Occurred\n");
+            for (j = 0; j < i; j++) {
+                free(v[j].values);
+            }
+            free(v);
+            fclose(f);
+            exit(1);
+        }
+
+        for (j = 0; j < cols; j++) {
+            fscanf(f, "%lf", &val);
+            v[i].values[j] = val;
+            fgetc(f); 
+        }
+    }
+
+    fclose(f);
+    return v;
 }
 
+int main(int argc, char *argv[]) {
+    char *file_name;
+    int n, d;
+    int i;
+    struct Vector *v;
+
+    if (argc != 3) {
+        printf("An Error Has Occurred\n");
+        return 1;
+    }
+
+    file_name = argv[2];
+
+    v = read_file(file_name, &n, &d);
+
+
+    if(strcmp(argv[1], "sym") == 0) {
+        Matrix *symMatrix = sym(v, n, d);
+        matrix_print(symMatrix);
+        matrix_free(symMatrix);
+    } else if(strcmp(argv[1], "ddg") == 0) {
+        Matrix *ddgMatrix = ddg(v, n, d);
+        matrix_print(ddgMatrix);
+        matrix_free(ddgMatrix);
+    } else if(strcmp(argv[1], "norm") == 0) {
+        Matrix *normMatrix = norm(v, n, d);
+        matrix_print(normMatrix);
+        matrix_free(normMatrix);
+    } else {
+        for (i = 0; i < n; i++) {
+        free(v[i].values);
+        }
+        free(v);
+        printf("An Error Has Occurred\n");
+        return 1;
+    }
+    for (i = 0; i < n; i++) {
+        free(v[i].values);
+    }
+    free(v);
+    return 0;
+}

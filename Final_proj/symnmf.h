@@ -13,6 +13,8 @@ typedef struct {
 } Matrix;
 
 /* Matrix functions */
+double calculateDistance(struct Vector *p, struct Vector *q, int d);
+void matrix_print(const Matrix *mat);
 Matrix* matrix_create(int rows, int cols);
 void matrix_free(Matrix *mat);
 Matrix* matrix_multiply(const Matrix *A, const Matrix *B);
@@ -25,6 +27,5 @@ double matrix_hilbert_schmidt_norm(const Matrix *A);
 
 /* initialize a Vector's storage */
 struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, int K, int max_iters, double epsilon);
-//void initVector(struct Vector *v, int d);
 
 #endif /* CAP_H_ */
