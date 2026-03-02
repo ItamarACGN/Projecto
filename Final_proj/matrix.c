@@ -1,11 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "symnmf.h"
 
-typedef struct {
-    int rows;
-    int cols;
-    double *data;
-} Matrix;
+double calculateDistance(struct Vector *p, struct Vector *q, int d) {
+    double sum = 0.0;
+    int i;
+    for (i = 0; i < d; i++) {
+        double diff = p->values[i] - q->values[i];
+        sum += diff * diff;
+    }
+    return sum; 
+}
 
 // Initialize a new matrix with zeros
 Matrix* matrix_create(int rows, int cols) {

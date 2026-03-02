@@ -1,7 +1,6 @@
 # define PY_SSIZE_T_CLEAN
-# include <Python.h>       /* MUST include <Python.h>, this implies inclusion of the following standard headers:
-                             <stdio.h>, <string.h>, <errno.h>, <limits.h>, <assert.h> and <stdlib.h> (if available). */
-# include <math.h>         /* include <Python.h> has to be before any standard headers are included */
+# include <Python.h>       
+# include <math.h>         
 # include "cap.h"
 
 static PyObject* list_of_vectors_to_pyobject(struct Vector* vectors, int K, int D) {
@@ -76,7 +75,6 @@ static PyObject* kmeans_capi(PyObject *self, PyObject *args)
 static PyMethodDef capiMethods[] = {
     {"kmeans",                   
       (PyCFunction) kmeans_capi,
-       /*function and returns static PyObject*  */
       METH_VARARGS,         
       PyDoc_STR("A C function that implements kmeans given the starting centroids.")},
     {NULL, NULL, 0, NULL}     

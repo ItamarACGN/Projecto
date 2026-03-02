@@ -34,7 +34,6 @@ double initVector(struct Vector *v, int d) {
     v->clusterID = -1;
     return 0;
 }
-/* if data is 2 dimentional should it be int** data? */
 
 void update_clasters(struct Vector *data, struct Vector *centroids, int N, int D, int K) {
    int i, j;
@@ -104,7 +103,7 @@ int has_converged(struct Vector *old_centroids, struct Vector *centroids, int K,
 
 struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, int K, int max_iters, double epsilon_val) {
    int i, j, iter;
-   struct Vector* old_centroids; /* Moved declaration to top */
+   struct Vector* old_centroids; 
    epsilon = epsilon_val;
 
    for(iter = 1; iter < max_iters; iter++) {
