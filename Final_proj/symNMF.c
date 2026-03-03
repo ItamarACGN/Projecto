@@ -46,10 +46,7 @@ Matrix* ddg(struct Vector *v, int n, int d){
 
 Matrix* norm(struct Vector *v, int n, int d){
     int i;
-    Matrix *normMatrix;
-    Matrix *temp;
-    Matrix *ddgMatrix;
-    Matrix *symMatrix;
+    Matrix *normMatrix, *temp, *ddgMatrix, *symMatrix;
     symMatrix = sym(v, n, d);
     if (symMatrix == NULL) return NULL;
     
@@ -121,21 +118,18 @@ Matrix * optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon){
     return curr_H;
 }
 
-struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
-    int rows = 0;
-    int cols = 0;
+void error_and_exit() {
+    printf("An Error Has Occurred\n");
+    exit(1);
+}
+
+void find_rows_cols(const char *file_name, int *rows_out, int *cols_out) {
+    int rows = 0, cols = 0, c;
     double val;
-    int c;
-    int i, j;
-    FILE *f;
-    struct Vector *v;
-
-    f = fopen(file_name, "r");
+    FILE *f = fopen(file_name, "r");
     if (f == NULL) {
-        printf("An Error Has Occurred\n");
-        exit(1);
+        error_and_exit();
     }
-
     while (fscanf(f, "%lf", &val) == 1) {
         if (rows == 0) {
             cols++;
@@ -148,30 +142,38 @@ struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
             break;
         }
     }
+    fclose(f);
+    *rows_out = rows;
+    *cols_out = cols;
+}
 
+struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
+    int rows = 0,cols = 0,i,j;
+    double val;
+    FILE *f;
+    struct Vector *v;
+    f = fopen(file_name, "r");
+    if (f == NULL)error_and_exit();
+    find_rows_cols(file_name, &rows, &cols);
     *n_out = rows;
     *d_out = cols;
 
     v = (struct Vector*)malloc(rows * sizeof(struct Vector));
     if (v == NULL) {
-        printf("An Error Has Occurred\n");
         fclose(f);
-        exit(1);
+        error_and_exit();
     }
-
-    rewind(f);
 
     for (i = 0; i < rows; i++) {
         v[i].values = (double*)malloc(cols * sizeof(double));
         
         if (v[i].values == NULL) {
-            printf("An Error Has Occurred\n");
             for (j = 0; j < i; j++) {
                 free(v[j].values);
             }
             free(v);
             fclose(f);
-            exit(1);
+            error_and_exit();
         }
 
         for (j = 0; j < cols; j++) {
@@ -180,7 +182,6 @@ struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
             fgetc(f); 
         }
     }
-
     fclose(f);
     return v;
 }
