@@ -5,11 +5,17 @@
 # include "symnmf.h"
 
 static PyObject* list_of_vectors_to_pyobject(struct Vector* vectors, int k, int D) {
-    PyObject* py_list = PyList_New(k);
-    for (int i = 0; i < k; i++) {
+    /*
+    converts list of vectors structs to a py object
+    */
+    PyObject* py_list;
+    int i, j;
+    PyObject* py_value;
+    py_list = PyList_New(k);
+    for (i = 0; i < k; i++) {
         PyObject* py_vector = PyList_New(D);
-        for (int j = 0; j < D; j++) {
-            PyObject* py_value = PyFloat_FromDouble(vectors[i].values[j]);
+        for (j = 0; j < D; j++) {
+            py_value = PyFloat_FromDouble(vectors[i].values[j]);
             PyList_SetItem(py_vector, j, py_value);
         }
         PyList_SetItem(py_list, i, py_vector);
@@ -19,27 +25,30 @@ static PyObject* list_of_vectors_to_pyobject(struct Vector* vectors, int k, int 
 
 static struct Vector* pyList_to_vectors (PyObject* points_obj)
 {
-    /* Convert a Python list of lists to a C array of Vector structs */
-    Py_ssize_t py_size = PyList_Size(points_obj);
-    int size = (int)py_size;
-    int dim = 0;
-    
-    struct Vector *points = malloc(sizeof(struct Vector) * size);
+    /* 
+    Convert a Python list of lists to a C array of Vector structs 
+    */
+    int i, j, size, dim;
+    double val;
+    Py_ssize_t py_size;
+    struct Vector *points;
+    PyObject* item, point_obj;
+    py_size = PyList_Size(points_obj);
+    size = (int)py_size;
+    dim = 0;
+    points = malloc(sizeof(struct Vector) * size);
     if (!points)
     {
         return NULL;
     }
-    
-    for (int i = 0; i < size; i++){
-        PyObject* point_obj = PyList_GetItem(points_obj, i);
+    for (i = 0; i < size; i++){
+        point_obj = PyList_GetItem(points_obj, i);
         dim = PyList_Size(point_obj);
-
         initVector(&points[i], dim);
-        
-        for (int j = 0; j < dim; j++)
+        for (j = 0; j < dim; j++)
         {
-            PyObject* item = PyList_GetItem(point_obj, j);
-            double val = PyFloat_AsDouble(item);
+            item = PyList_GetItem(point_obj, j);
+            val = PyFloat_AsDouble(item);
             points[i].values[j] = val;
         }
     }
@@ -48,13 +57,16 @@ static struct Vector* pyList_to_vectors (PyObject* points_obj)
 
 static PyObject* matrix_to_pyobject(struct Matrix* matrix) {
     /* Convert a C Matrix struct to a Python list of lists */
-    PyObject* py_matrix = PyList_New(matrix -> rows);
+    PyObject* py_value, py_row;
+    PyObject* py_matrix;
     int i, j;
+    
+    py_matrix = PyList_New(matrix -> rows);
     for (i = 0; i < matrix -> rows; i++) {
-        PyObject* py_row = PyList_New(matrix -> cols);
+        py_row = PyList_New(matrix -> cols);
         for (j = 0; j < matrix -> cols; j++) {
             //converts each row to a list of floats
-            PyObject* py_value = PyFloat_FromDouble(matrix_get(matrix, i, j));
+            py_value = PyFloat_FromDouble(matrix_get(matrix, i, j));
             PyList_SetItem(py_row, j, py_value);
         }
         PyList_SetItem(py_matrix, i, py_row);
