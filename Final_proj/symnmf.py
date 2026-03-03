@@ -1,5 +1,6 @@
 import numpy as np
 from sys import argv
+import symnmfmodule as symnmf
 
 MAX_ITER = 300
 EPSILON = 1e-4
@@ -71,15 +72,44 @@ def read_input():
     return data, N, k_val, MAX_ITER, EPSILON, d
 
 
-
-    
-
 def init_H(W, n, k):
     """
-    Initializes the H (n by k) matrix with random values.
+    Initializes the H (n by k) matrix randomly according to instractions.
+    ( each value is chosen uniformly at random from the range [0, 2*sqrt(m/k)] where m is the mean of all elements in W).
     @param W: The innormalized similarity matrix.
     @param n: The number of rows in W.
     @param k: The number of clusters.
     """
-    np.random.seed(1234)  
-    H = np.random.rand(W.shape[0], k)
+    np.random.seed(1234)
+    m = np.mean(W)  # Compute the mean of all elements in W
+    H = np.random.uniform(0, 2 * np.sqrt(m / k), size=(n, k)) 
+    return H
+
+def execute_goal(data, N, k_val, d, goal):
+    """
+    Executes the given goal using the symnmf C API.
+    @param data: The input data as a python list of lists.
+    @param N: The number of data points.
+    @param k_val: The number of clusters.
+    @param d: The number of dimensions.
+    @param goal: The goal to execute (one of "symnmf", "ddg", "sym", "norm").
+    @return: The result of the executed goal as a numpy array or None if an error occurred.
+    """
+    if goal == "symnmf":
+        W = np.array(symnmf.execute_goal(data, N, d, "sym"))
+        H = init_H(W, N, k_val)
+        result = symnmf.optimize_H(H.tolist(), W.tolist(), MAX_ITER, EPSILON)
+
+    else:
+        symnmf.execute_goal(data, N, d, goal)
+    return result
+
+
+if __name__ == "__main__":
+    input_data = read_input()
+    if input_data is not None:
+        data, N, k_val, max_iters, epsilon, d = input_data
+        result = execute_goal(data.tolist(), N, k_val, d, argv[2])
+        if result is not None:
+            np.set_printoptions(precision=4, suppress=True)
+            print(result)
