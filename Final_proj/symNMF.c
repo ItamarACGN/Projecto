@@ -185,11 +185,26 @@ struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
     return v;
 }
 
+/* Process vectors based on goal and execute corresponding action */
+Matrix* execute_goal(struct Vector *v, int n, int d, const char *goal) {
+    if(strcmp(goal, "sym") == 0) {
+        return sym(v, n, d);
+    } else if(strcmp(goal, "ddg") == 0) {
+        return ddg(v, n, d);
+    } else if(strcmp(goal, "norm") == 0) {
+        return norm(v, n, d);
+    } else {
+        printf("An Error Has Occurred\n");
+        return NULL;
+    }
+}
+
 int main(int argc, char *argv[]) {
     char *file_name;
     int n, d;
     int i;
     struct Vector *v;
+    Matrix *result;
 
     if (argc != 3) {
         printf("An Error Has Occurred\n");
@@ -200,27 +215,13 @@ int main(int argc, char *argv[]) {
 
     v = read_file(file_name, &n, &d);
 
-
-    if(strcmp(argv[1], "sym") == 0) {
-        Matrix *symMatrix = sym(v, n, d);
-        matrix_print(symMatrix);
-        matrix_free(symMatrix);
-    } else if(strcmp(argv[1], "ddg") == 0) {
-        Matrix *ddgMatrix = ddg(v, n, d);
-        matrix_print(ddgMatrix);
-        matrix_free(ddgMatrix);
-    } else if(strcmp(argv[1], "norm") == 0) {
-        Matrix *normMatrix = norm(v, n, d);
-        matrix_print(normMatrix);
-        matrix_free(normMatrix);
-    } else {
-        for (i = 0; i < n; i++) {
-        free(v[i].values);
-        }
-        free(v);
-        printf("An Error Has Occurred\n");
-        return 1;
+    result = execute_goal(v, n, d, argv[1]);
+    
+    if (result != NULL) {
+        matrix_print(result);
+        matrix_free(result);
     }
+    
     for (i = 0; i < n; i++) {
         free(v[i].values);
     }
