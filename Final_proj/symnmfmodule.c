@@ -19,9 +19,7 @@ static PyObject* list_of_vectors_to_pyobject(struct Vector* vectors, int k, int 
 
 static struct Vector* pyList_to_vectors (PyObject* points_obj)
 {
-    """
-    Convert a Python list of lists to a C array of Vector structs.
-    """
+    /* Convert a Python list of lists to a C array of Vector structs */
     Py_ssize_t py_size = PyList_Size(points_obj);
     int size = (int)py_size;
     int dim = 0;
@@ -49,9 +47,7 @@ static struct Vector* pyList_to_vectors (PyObject* points_obj)
 }
 
 static PyObject* matrix_to_pyobject(struct Matrix* matrix) {
-    """
-    Convert a C Matrix struct to a Python list of lists.
-    """
+    /* Convert a C Matrix struct to a Python list of lists */
     PyObject* py_matrix = PyList_New(matrix -> rows);
     int i, j;
     for (i = 0; i < matrix -> rows; i++) {
@@ -67,11 +63,7 @@ static PyObject* matrix_to_pyobject(struct Matrix* matrix) {
 }
 
 static Matrix* py_list_to_matrix(PyObject* python_list) {
-    """
-    Convert a Python list of lists to a C Matrix struct.
-
-    """
-    //initializing params
+    /* Convert a Python list of lists to a C Matrix struct */
     int i, j;
     int rows, cols;
     PyObject *row_obj, *item;
@@ -107,39 +99,9 @@ void free_vectors(struct Vector* vectors, int K) {
     free(vectors);
 }
 
-static PyObject* norm_capi(PyObject *self, PyObject *args)
-{
-    """
-    the wrapper function for the norm function
-    """
-    PyObject *data;
-    int n, d;
-    if(!PyArg_ParseTuple(args, "Oii", &data, &n, &d)) {
-        return NULL;
-    }
-    struct Vector* data_vector = pyList_to_vectors(data);
-    //memory allocation check
-    if (data_vector == NULL) {
-        return NULL;
-    }
-    struct Matrix* result_matrix = norm(data_vector, n, d);
-    //memory allocation check   
-    if (result_matrix == NULL) {
-        free_vectors(data_vector, n);
-        return NULL;
-    }
-    PyObject* result = matrix_to_pyobject(result_matrix);
-    free_vectors(data_vector, n);
-    matrix_free(result_matrix);
-    return result;
-}
-
-
 static PyObject* execute_goal_capi(PyObject *self, PyObject *args)
 {
-    """
-    the wrapper function for the execute_goal function
-    """
+    /* Wrapper function for the execute_goal function */
     PyObject *data;
     int n, d;
     const char* goal;
@@ -165,9 +127,7 @@ static PyObject* execute_goal_capi(PyObject *self, PyObject *args)
 
 static PyObject* optimize_H_capi(PyObject *self, PyObject *args)
 {
-    """
-    the wrapper function for the optimize_H function
-    """
+    /* Wrapper function for the optimize_H function */
     PyObject *H_obj, *W_obj;
     int max_iters;
     double epsilon;
@@ -199,15 +159,13 @@ static PyObject* optimize_H_capi(PyObject *self, PyObject *args)
 static PyMethodDef capiMethods[] = 
 {
     {"execute_goal",                   
-      (PyCFunction) execute_goal_capi,
-       /*function and returns static PyObject*  */
-      METH_VARARGS,         
-      PyDoc_STR("A C function that implements execute_goal given the data and goal.")},
+    (PyCFunction) execute_goal_capi,
+    METH_VARARGS,         
+    PyDoc_STR("A C function that implements execute_goal given the data and goal.")},
     {"optimize_H",                   
-      (PyCFunction) optimize_H_capi,
-       /*function and returns static PyObject*  */
-      METH_VARARGS,         
-      PyDoc_STR("A C function that implements optimize_H given H, W, max_iters and epsilon.")},
+    (PyCFunction) optimize_H_capi,
+    METH_VARARGS,         
+    PyDoc_STR("A C function that implements optimize_H given H, W, max_iters and epsilon.")},
     {NULL, NULL, 0, NULL}     
 };
 
