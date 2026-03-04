@@ -4,10 +4,11 @@
 # include <math.h>         /* include <Python.h> has to be before any standard headers are included */
 # include "symnmf.h"
 
+/**  i thik we dont need this function but afraid to delete now
 static PyObject* list_of_vectors_to_pyobject(struct Vector* vectors, int k, int D) {
-    /*
-    converts list of vectors structs to a py object
-    */
+    
+    //converts list of vectors structs to a py object
+    
     PyObject* py_list;
     int i, j;
     PyObject* py_value;
@@ -22,7 +23,7 @@ static PyObject* list_of_vectors_to_pyobject(struct Vector* vectors, int k, int 
     }
     return py_list;
 }
-
+*/
 static struct Vector* pyList_to_vectors (PyObject* points_obj)
 {
     /* 
@@ -32,7 +33,7 @@ static struct Vector* pyList_to_vectors (PyObject* points_obj)
     double val;
     Py_ssize_t py_size;
     struct Vector *points;
-    PyObject* item, point_obj;
+    PyObject *item, *point_obj;
     py_size = PyList_Size(points_obj);
     size = (int)py_size;
     dim = 0;
@@ -55,10 +56,10 @@ static struct Vector* pyList_to_vectors (PyObject* points_obj)
     return points;
 }
 
-static PyObject* matrix_to_pyobject(struct Matrix* matrix) {
-    /* Convert a C Matrix struct to a Python list of lists */
-    PyObject* py_value, py_row;
-    PyObject* py_matrix;
+static PyObject* matrix_to_pyobject( Matrix* matrix) {
+    /* Convert a C Matrix to a Python list of lists */
+    PyObject *py_value, *py_row;
+    PyObject *py_matrix;
     int i, j;
     
     py_matrix = PyList_New(matrix -> rows);
@@ -125,7 +126,7 @@ static PyObject* execute_goal_capi(PyObject *self, PyObject *args)
     if (data_vector == NULL) {
         return NULL;
     }
-    struct Matrix* result_matrix = execute_goal(data_vector, n, d);
+    Matrix* result_matrix = execute_goal(data_vector, n, d, goal);
     //memory allocation check   
     if (result_matrix == NULL) {
         free_vectors(data_vector, n);
@@ -146,15 +147,15 @@ static PyObject* optimize_H_capi(PyObject *self, PyObject *args)
     if(!PyArg_ParseTuple(args, "OOid", &H_obj, &W_obj, &max_iters, &epsilon)) {
         return NULL;
     }
-    struct Matrix* H = py_list_to_matrix(H_obj);
-    struct Matrix* W = py_list_to_matrix(W_obj);
+    Matrix *H = py_list_to_matrix(H_obj);
+    Matrix *W = py_list_to_matrix(W_obj);
     //memory allocation check
     if (H == NULL || W == NULL) {
         matrix_free(H);
         matrix_free(W);
         return NULL;
     }
-    struct Matrix* result_matrix = optimize_H(H, W, max_iters, epsilon);
+    Matrix* result_matrix = optimize_H(H, W, max_iters, epsilon);
     //memory allocation check   
     if (result_matrix == NULL) {
         matrix_free(H);

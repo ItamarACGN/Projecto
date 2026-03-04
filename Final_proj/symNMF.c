@@ -4,6 +4,15 @@
 #include <math.h>
 #include <string.h>
 
+double initVector(struct Vector *v, int d) {
+    v->values = (double *)malloc(d * sizeof(double));
+    if (v->values == NULL) {
+        error_and_exit();
+    }
+    v->clusterID = -1;
+    return 0;
+}
+
 Matrix* sym(struct Vector *v, int n, int d){
     int i,j;
     Matrix *result;

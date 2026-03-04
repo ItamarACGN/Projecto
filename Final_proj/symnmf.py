@@ -5,6 +5,8 @@ import symnmfmodule as symnmf
 MAX_ITER = 300
 EPSILON = 1e-4
 GOALS = {"symnmf", "ddg", "sym", "norm"}
+ERROR_MSG = "An Error Has Occurred"
+
 
 def file_to_matrix(file_name):
     """
@@ -45,7 +47,7 @@ def read_input():
     """
     # 1. Validate input length
     if len(argv) != 4:
-        print("An Error Has Occurred")
+        print("An error has accured")
         return None
 
     # 2. Assign variables based on input length
@@ -59,14 +61,14 @@ def read_input():
         return None
     
     # 4. file reading using helper function
-    data, N, d = file_to_matrix(open(raw_file, 'r'))
+    data, N, d = file_to_matrix(raw_file)
     if data is None:
-            print("An Error Has Occurred")
-            return None
+        # file_to_matrix already printed a more specific message when possible
+        return None
     
-    # 5. Validate K - nedds to be positive int less than N
+    # 5. Validate K - needs to be positive int less than N
     if not raw_k.isdigit() or int(raw_k) <= 0 or int(raw_k) >= N:
-        print("An Error Has Occurred")
+        print(f"{line}")
         return None
     k_val = int(raw_k)
     return data, N, k_val, MAX_ITER, EPSILON, d

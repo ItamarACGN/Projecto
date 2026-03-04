@@ -12,6 +12,9 @@ typedef struct {
     double *data;
 } Matrix;
 
+/*vector functions*/
+double initVector(struct Vector *v, int d); //vector initialization - memory allocation
+
 /* Matrix functions */
 double calculateDistance(struct Vector *p, struct Vector *q, int d); /* Compute Euclidean distance between two vectors */
 void matrix_print(const Matrix *mat); /* Print matrix to stdout in comma-separated format */
@@ -29,10 +32,11 @@ double matrix_hilbert_schmidt_norm(const Matrix *A); /* Compute Frobenius norm o
 struct Vector* fit(struct Vector *data, struct Vector *centroids, int N, int D, int K, int max_iters, double epsilon); /* Run k-means clustering algorithm */
 
 /* Symnmf functions */
+
 Matrix* execute_goal(struct Vector *v, int n, int d, const char *goal); /* Process vectors based on goal and execute corresponding action */
 Matrix* ddg(struct Vector *v, int n, int d); /* Compute the degree matrix */
 Matrix* sym(struct Vector *v, int n, int d); /* Compute the similarity matrix*/
 Matrix* norm(struct Vector *v, int n, int d); /* Compute the normalized similarity matrix */
 Matrix* optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon); /* Optimize H matrix using multiplicative update rules */
-
+void error_and_exit(); /*prints error messege and quirs - helper*/
 #endif /* CAP_H_ */
