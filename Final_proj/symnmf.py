@@ -1,6 +1,7 @@
 import numpy as np
-from sys import argv
+from sys import argv, stdout
 import symnmfmodule as symnmf
+
 
 MAX_ITER = 300
 EPSILON = 1e-4
@@ -104,15 +105,15 @@ def execute_goal(data, N, k_val, d, goal, max_iter = MAX_ITER, epsilon = EPSILON
 
     else:
         result = symnmf.execute_goal(data, N, d, goal)
-    return result
+    return np.array(result)
 
 
 if __name__ == "__main__":
     input_data = read_input()
     if input_data is not None:
-        print( input_data)
+        #print( input_data)
         data, N, k_val, d, goal = input_data
         result = execute_goal(data.tolist(), N, k_val, d, goal)
         if result is not None:
-            np.set_printoptions(precision=4, suppress=True)
-            print(result)
+            #TODO make sure the matrix is not transposed!!
+            np.savetxt(stdout, result, fmt="%.4f", delimiter=", ")#prints the resault
