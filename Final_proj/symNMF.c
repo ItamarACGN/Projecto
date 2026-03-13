@@ -92,12 +92,16 @@ Matrix* norm(struct Vector *v, int n, int d){
 Matrix * update_H (Matrix * curr_H, Matrix * W){
     int i,j;
     double beta,val;
-    Matrix * next_H, * WH, * denominator;
+    Matrix * next_H, * WH, * denominator, * temp_transpose;
     next_H = matrix_create(curr_H -> rows, curr_H -> cols);
     beta = 0.5;
     WH = matrix_multiply(W, curr_H);
-    denominator = matrix_multiply( curr_H, matrix_transpose(curr_H));
-    denominator = matrix_multiply(denominator, curr_H);
+    temp_transpose = matrix_transpose(curr_H);
+    denominator = matrix_multiply(curr_H, temp_transpose);
+    matrix_free(temp_transpose);
+    Matrix * temp_denom = denominator;
+    denominator = matrix_multiply(temp_denom, curr_H);
+    matrix_free(temp_denom);
 
     for (i = 0; i < curr_H -> rows; i++){
         for (j = 0; j < curr_H -> cols; j++){
@@ -112,15 +116,18 @@ Matrix * update_H (Matrix * curr_H, Matrix * W){
 
 Matrix * optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon){
     int iter;
-    Matrix * curr_H = H;
+    Matrix *curr_H, *next_H, *diff_matrix;
+    double diff;
+    curr_H = H;
     for (iter = 0; iter < max_iters; iter++){
-        Matrix * next_H = update_H(curr_H, W);
-        double diff = matrix_hilbert_schmidt_norm(matrix_subtract(next_H, curr_H));
+        next_H = update_H(curr_H, W);
+        diff_matrix = matrix_subtract(next_H, curr_H);
+        diff = matrix_hilbert_schmidt_norm(diff_matrix);
+        matrix_free(diff_matrix);
         if (diff < epsilon){
             matrix_free(next_H);
             break;
         }
-        matrix_free(curr_H);
         curr_H = next_H;
     }
     matrix_print(curr_H);

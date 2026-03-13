@@ -71,7 +71,7 @@ def read_input():
         print(f"{line}")
         return None
     k_val = int(raw_k)
-    return data, N, k_val, MAX_ITER, EPSILON, d
+    return data, N, k_val, d, raw_goal
 
 
 def init_H(W, n, k):
@@ -87,7 +87,7 @@ def init_H(W, n, k):
     H = np.random.uniform(0, 2 * np.sqrt(m / k), size=(n, k)) 
     return H
 
-def execute_goal(data, N, k_val, d, goal):
+def execute_goal(data, N, k_val, d, goal, max_iter = MAX_ITER, epsilon = EPSILON):
     """
     Executes the given goal using the symnmf C API.
     @param data: The input data as a python list of lists.
@@ -100,18 +100,19 @@ def execute_goal(data, N, k_val, d, goal):
     if goal == "symnmf":
         W = np.array(symnmf.execute_goal(data, N, d, "sym"))
         H = init_H(W, N, k_val)
-        result = symnmf.optimize_H(H.tolist(), W.tolist(), MAX_ITER, EPSILON)
+        result = symnmf.optimize_H(H.tolist(), W.tolist(), max_iter, epsilon)
 
     else:
-        symnmf.execute_goal(data, N, d, goal)
+        result = symnmf.execute_goal(data, N, d, goal)
     return result
 
 
 if __name__ == "__main__":
     input_data = read_input()
     if input_data is not None:
-        data, N, k_val, max_iters, epsilon, d = input_data
-        result = execute_goal(data.tolist(), N, k_val, d, argv[2])
+        print( input_data)
+        data, N, k_val, d, goal = input_data
+        result = execute_goal(data.tolist(), N, k_val, d, goal)
         if result is not None:
             np.set_printoptions(precision=4, suppress=True)
             print(result)
