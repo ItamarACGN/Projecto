@@ -111,6 +111,10 @@ def stdin_to_vectors():
             vectors.append(Vector(nums))
     return vectors
 
+def data_to_vectors(data):
+    """converts data matrix to vector list"""
+    
+    return [Vector(coords) for coords in data]
 
 def print_output(vectors):
     for v in vectors:
