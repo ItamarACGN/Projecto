@@ -1,17 +1,18 @@
 import symnmf 
 import kmeans
+import numpy as np
+from sklearn.metrics import silhouette_samples
 
 def run_algos():
     H = symnmf.main()
-    symnmf_res = clusters_from_h(H)
-    kmeans_res = kmeans.main()
+    symnmf_clusters = get_clusters(H) 
+    kmeans_centroids = kmeans.main() 
 
-    return symnmf
+    symnmf_score = silhouette_samples(get_points(), symnmf_clusters)
 
 def get_points():
     return symnmf.read_input()[0]
-import numpy as np
-from sklearn.metrics import silhouette_samples
+
 
 def get_clusters(H) -> list[int]:
     """

@@ -98,7 +98,7 @@ def kmeans_on_vectors(vectors, k , iter = DEFAULT_ITER):
         #emptying the next clusters for the next iteration
         next_clusters = [[] for i in range(k)]
         
-    return clusters
+    return [Vector.centroid(cluster) for cluster in clusters]
 
 
 def stdin_to_vectors():
@@ -140,12 +140,11 @@ def main():
     #if iter is not given we assign it to the default value        
     else:
         iter = DEFAULT_ITER
-    clusters = kmeans_on_vectors(vectors, k, iter)
+    res = kmeans_on_vectors(vectors, k, iter)
+    print_output(res)
     
 
 
 if __name__ == "__main__":
-    clusters = main()
-    res = [Vector.centroid(cluster) for cluster in clusters]
-    print_output(res)
-    
+
+    main()
