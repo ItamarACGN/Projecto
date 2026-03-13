@@ -13,7 +13,7 @@ typedef struct {
 } Matrix;
 
 /*vector functions*/
-double initVector(struct Vector *v, int d); //vector initialization - memory allocation
+double initVector(struct Vector *v, int d); /*vector initialization - memory allocation*/
 
 /* Matrix functions */
 double calculateDistance(struct Vector *p, struct Vector *q, int d); /* Compute Euclidean distance between two vectors */

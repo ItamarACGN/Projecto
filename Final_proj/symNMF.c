@@ -93,13 +93,14 @@ Matrix * update_H (Matrix * curr_H, Matrix * W){
     int i,j;
     double beta,val;
     Matrix * next_H, * WH, * denominator, * temp_transpose;
+    Matrix * temp_denom;
     next_H = matrix_create(curr_H -> rows, curr_H -> cols);
     beta = 0.5;
     WH = matrix_multiply(W, curr_H);
     temp_transpose = matrix_transpose(curr_H);
     denominator = matrix_multiply(curr_H, temp_transpose);
     matrix_free(temp_transpose);
-    Matrix * temp_denom = denominator;
+    temp_denom = denominator;
     denominator = matrix_multiply(temp_denom, curr_H);
     matrix_free(temp_denom);
 
