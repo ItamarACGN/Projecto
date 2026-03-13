@@ -69,7 +69,7 @@ def read_input():
     
     # 5. Validate K - needs to be positive int less than N
     if not raw_k.isdigit() or int(raw_k) <= 0 or int(raw_k) >= N:
-        print(f"{line}")
+        #print(f"{line}")
         return None
     k_val = int(raw_k)
     return data, N, k_val, d, raw_goal
@@ -117,3 +117,4 @@ if __name__ == "__main__":
         if result is not None:
             #TODO make sure the matrix is not transposed!!
             np.savetxt(stdout, result, fmt="%.4f", delimiter=", ")#prints the resault
+

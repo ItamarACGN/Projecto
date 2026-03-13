@@ -130,7 +130,6 @@ Matrix * optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon){
         }
         curr_H = next_H;
     }
-    matrix_print(curr_H);
     return curr_H;
 }
 
