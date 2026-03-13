@@ -68,7 +68,7 @@ def read_input():
     
     # 5. Validate K - needs to be positive int less than N
     if not raw_k.isdigit() or int(raw_k) <= 0 or int(raw_k) >= N:
-        print(f"{line}")
+        #print(f"{line}")
         return None
     k_val = int(raw_k)
     return data, N, k_val, d, raw_goal
@@ -110,9 +110,9 @@ def execute_goal(data, N, k_val, d, goal, max_iter = MAX_ITER, epsilon = EPSILON
 if __name__ == "__main__":
     input_data = read_input()
     if input_data is not None:
-        print( input_data)
+        #print( input_data)
         data, N, k_val, d, goal = input_data
         result = execute_goal(data.tolist(), N, k_val, d, goal)
         if result is not None:
             np.set_printoptions(precision=4, suppress=True)
-            print(result)
+            #print(result)
