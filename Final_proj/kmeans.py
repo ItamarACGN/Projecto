@@ -141,6 +141,7 @@ def main():
     else:
         iter = DEFAULT_ITER
     clusters = kmeans_on_vectors(vectors, k, iter)
+    return clusters
     
 
 
