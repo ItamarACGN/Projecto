@@ -51,8 +51,7 @@ def read_input():
     """
     # 1. Validate input length
     if len(argv) != 4:
-        print("An error has accured")
-        return None
+        print_error_and_exit()
 
     # 2. Assign variables based on input length
     raw_k = argv[1]
@@ -122,6 +121,6 @@ if __name__ == "__main__":
     result = main()
     if result is not None:
         #TODO make sure the matrix is not transposed!!
-        np.savetxt(stdout, result, fmt="%.4f", delimiter=", ")#prints the resault
+        np.savetxt(stdout, result, fmt="%.4f", delimiter=",")#prints the resault
 
 
