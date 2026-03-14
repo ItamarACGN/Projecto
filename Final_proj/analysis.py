@@ -38,8 +38,9 @@ def read_input():
     return data, N, k_val, d
 
 
-def get_kmeans_clusters(X):
-    kmeans_clusters = kmeans.main() #gets the clusters as a list of lists of vectors
+def get_kmeans_clusters(X , k):
+    data = kmeans.data_to_vectors(X)
+    kmeans_clusters = kmeans_on_vectors(X, k) #gets the clusters as a list of lists of vectors
     kmeans_clusters = [[vector.vector for vector in centroid] for centroid in kmeans_centroids] # turns the vectors inro tuples
     kmeans_labels = []
     for cluster_id in range(len(kmeans_clusters)):
@@ -48,18 +49,16 @@ def get_kmeans_clusters(X):
         kmeans_labels[vector_id] = cluster_id
     return kmeans_labels
 
-def score_algos():
-    X = get_points()
+def score_algos(X, k):
     kmeans_labels = get_kmeans_clusters(X)
     symnmf_labels = get_symnmf_clusters()
     symnmf_score = silhouette_samples(X, symnmf_clusters)
     kmeans_score = silhouette_samples(X, kmeans_clusters)
     return kmeans_score, symnmf_score
 
-def get_points():
-    return symnmf.read_input()[0]
+
 def run_algos():
-    data, N, k_val, d = read_input()
+ 
     data = data.tolist()
     H = symnmf.execute_goal(data,N,k_val,d,"symnmf")
     symnmf_clusters = get_clusters(H) 
@@ -75,10 +74,12 @@ def get_symnmf_clusters(H) -> list[int]:
     @param H: The H matrix as a numpy array.
     @return: A list of cluster assignments for each data point.
     """
-    H = symnmf.main()
+    H = 
     return np.argmax(H, axis=1).tolist()
 
 if __name__ == "__main__":
+    data, N, k_val, d = read_input()
+    data = data.tolist()
     kmenas_score ,  symnmf_score = score_algos()
     print(f"nmf: {symnmf_score}")
     print(f"kmeans: {kmeans_score}")
