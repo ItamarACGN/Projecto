@@ -154,7 +154,4 @@ if __name__ == "__main__":
     clusters = main()
     res = [Vector.centroid(cluster) for cluster in clusters]
     print_output(res)
-<<<<<<< HEAD
     
-=======
->>>>>>> b029a99bd12e3793056a6fecd9c7b119ab2a238f
