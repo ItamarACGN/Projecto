@@ -39,17 +39,11 @@ def read_input():
 def run_algos():
     data, N, k_val, d = read_input()
     data = data.tolist()
-    print(data, N, k_val, d)
     H = symnmf.execute_goal(data,N,k_val,d,"symnmf")
     symnmf_clusters = get_clusters(H) 
-    print(H)
-    #kmeans_centroids = kmeans.main() 
-    print(data, symnmf_clusters)
+
     symnmf_score = silhouette_samples(data, symnmf_clusters)
     print(symnmf_score)
-
-def get_points():
-    return symnmf.read_input()[0]
 
 
 def get_clusters(H) -> list[int]:
