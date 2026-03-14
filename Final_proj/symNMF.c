@@ -67,13 +67,13 @@ Matrix* norm(struct Vector *v, int n, int d){
     for(i = 0; i < n; i++){
         ddgMatrix->data[i * n + i] = 1.0 / sqrt(ddgMatrix->data[i * n + i]);
     }
-    temp = matrix_multiply(ddgMatrix, symMatrix);
+    temp = diagonal_multiply_matrix(ddgMatrix, symMatrix);
     if (temp == NULL) {
         matrix_free(symMatrix);
         matrix_free(ddgMatrix);
         return NULL;
     }
-    normMatrix = matrix_multiply(temp, ddgMatrix);
+    normMatrix = matrix_multiply_diagonal(temp, ddgMatrix);
     if (normMatrix == NULL) {
         matrix_free(symMatrix);
         matrix_free(ddgMatrix);

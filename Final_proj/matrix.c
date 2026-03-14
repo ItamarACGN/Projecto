@@ -204,3 +204,58 @@ void matrix_print(const Matrix *mat) {
         printf("\n");
     }
 }
+/* Left Multiplication: C = D * A 
+ * Multiplying a diagonal matrix on the LEFT scales the ROWS of A.
+ */
+Matrix* diagonal_multiply_matrix(const Matrix *Diag, const Matrix *A) {
+    Matrix *result;
+    int i, j;
+    double diag_val;
+
+    /* Check if dimensions are compatible */
+    if (Diag->cols != A->rows) {
+        fprintf(stderr, "Dimension mismatch for diagonal multiplication.\n");
+        return NULL;
+    }
+    
+    result = matrix_create(A->rows, A->cols);
+    if (result == NULL) return NULL;
+    
+    /* O(n^2) optimization: Only multiply by the diagonal elements */
+    for (i = 0; i < A->rows; i++) {
+        diag_val = Diag->data[i * Diag->cols + i]; /* Get D[i][i] */
+        for (j = 0; j < A->cols; j++) {
+            result->data[i * result->cols + j] = diag_val * A->data[i * A->cols + j];
+        }
+    }
+    
+    return result;
+}
+
+/* Right Multiplication: C = A * D 
+ * Multiplying a diagonal matrix on the RIGHT scales the COLUMNS of A.
+ */
+Matrix* matrix_multiply_diagonal(const Matrix *A, const Matrix *Diag) {
+    Matrix *result;
+    int i, j;
+    double diag_val;
+
+    /* Check if dimensions are compatible */
+    if (A->cols != Diag->rows) {
+        fprintf(stderr, "Dimension mismatch for diagonal multiplication.\n");
+        return NULL;
+    }
+    
+    result = matrix_create(A->rows, A->cols);
+    if (result == NULL) return NULL;
+    
+    /* O(n^2) optimization: Only multiply by the diagonal elements */
+    for (j = 0; j < A->cols; j++) {
+        diag_val = Diag->data[j * Diag->cols + j]; /* Get D[j][j] */
+        for (i = 0; i < A->rows; i++) {
+            result->data[i * result->cols + j] = A->data[i * A->cols + j] * diag_val;
+        }
+    }
+    
+    return result;
+}

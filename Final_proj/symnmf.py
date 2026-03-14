@@ -101,7 +101,7 @@ def execute_goal(data, N, k_val, d, goal, max_iter = MAX_ITER, epsilon = EPSILON
     @return: The result of the executed goal as a numpy array or None if an error occurred.
     """
     if goal == "symnmf":
-        W = np.array(symnmf.execute_goal(data, N, d, "sym"))
+        W = np.array(symnmf.execute_goal(data, N, d, "norm"))
         H = init_H(W, N, k_val)
         result = symnmf.optimize_H(H.tolist(), W.tolist(), max_iter, epsilon)
 
