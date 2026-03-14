@@ -179,7 +179,7 @@ double matrix_hilbert_schmidt_norm(const Matrix *A) {
         sum_of_squares += val * val;
     }
     
-    return sqrt(sum_of_squares);
+    return sum_of_squares;
 }
 
 /* print matrix formatted for the final submission */
