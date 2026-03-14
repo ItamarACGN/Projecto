@@ -133,7 +133,7 @@ def main():
         k = int(k)
     else:
         print("Incorrect number of clusters!")
-        return
+        exit(1)
     #if iter is given we check its validity as well
     if len(argv) == 3:
         iter = argv[2]
@@ -141,7 +141,7 @@ def main():
             iter = int(iter)
         else:
             print("Incorrect maximum iterations!")
-            return
+            exit(1)
     #if iter is not given we assign it to the default value        
     else:
         iter = DEFAULT_ITER
