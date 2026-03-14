@@ -1,3 +1,4 @@
+
 from sys import stdin, argv
 import math
 
@@ -110,6 +111,10 @@ def stdin_to_vectors():
             vectors.append(Vector(nums))
     return vectors
 
+def data_to_vectors(data):
+    """converts data matrix to vector list"""
+    
+    return [Vector(coords) for coords in data]
 
 def print_output(vectors):
     for v in vectors:
@@ -128,7 +133,7 @@ def main():
         k = int(k)
     else:
         print("Incorrect number of clusters!")
-        return
+        exit(1)
     #if iter is given we check its validity as well
     if len(argv) == 3:
         iter = argv[2]
@@ -136,7 +141,7 @@ def main():
             iter = int(iter)
         else:
             print("Incorrect maximum iterations!")
-            return
+            exit(1)
     #if iter is not given we assign it to the default value        
     else:
         iter = DEFAULT_ITER
@@ -149,4 +154,7 @@ if __name__ == "__main__":
     clusters = main()
     res = [Vector.centroid(cluster) for cluster in clusters]
     print_output(res)
+<<<<<<< HEAD
     
+=======
+>>>>>>> b029a99bd12e3793056a6fecd9c7b119ab2a238f
