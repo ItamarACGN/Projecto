@@ -2,7 +2,7 @@ import symnmf
 import kmeans
 from kmeans import Vector
 import numpy as np
-from sklearn.metrics import silhouette_samples
+from sklearn.metrics import silhouette_score
 from sys import argv
 
 def print_error_and_exit():
@@ -39,47 +39,44 @@ def read_input():
 
 
 def get_kmeans_clusters(X , k):
-    data = kmeans.data_to_vectors(X)
-    kmeans_clusters = kmeans_on_vectors(X, k) #gets the clusters as a list of lists of vectors
-    kmeans_clusters = [[vector.vector for vector in centroid] for centroid in kmeans_centroids] # turns the vectors inro tuples
+    X_as_vectors = kmeans.data_to_vectors(X)
+    kmeans_clusters = kmeans.kmeans_on_vectors(X_as_vectors, k) #gets the clusters as a list of lists of vectors
+    kmeans_clusters = [[list(point.vector) for point in centroid] for centroid in kmeans_clusters] # turns the vectors inro tuples
     kmeans_labels = []
-    for cluster_id in range(len(kmeans_clusters)):
-        for vector in kmeans_clusters[cluster_id]:
-            vector_id = X.index(vector)
-        kmeans_labels[vector_id] = cluster_id
+    kmeans_labels = np.zeros(len(X), dtype=int)
+    for cluster_id, cluster_vectors in enumerate(kmeans_clusters):
+        cluster_vectors = np.array(cluster_vectors)
+        # Broadcasting: Compares every row in X with every row in the cluster
+        # X[:, None, :] reshapes to (N, 1, D) to compare against (M, D)
+        matches = (X[:, None, :] == cluster_vectors).all(axis=-1)
+        # Get the row indices in X that matched any vector in this cluster
+        row_indices = np.any(matches, axis=1)
+        # Assign the cluster ID
+        kmeans_labels[row_indices] = cluster_id
     return kmeans_labels
 
-def score_algos(X, k):
-    kmeans_labels = get_kmeans_clusters(X)
-    symnmf_labels = get_symnmf_clusters()
-    symnmf_score = silhouette_samples(X, symnmf_clusters)
-    kmeans_score = silhouette_samples(X, kmeans_clusters)
+def score_algos(X, N, k, d):
+
+    kmeans_clusters = get_kmeans_clusters(X, k)
+    symnmf_clusters = get_symnmf_clusters(X, N, k, d)
+    symnmf_score = silhouette_score(X, symnmf_clusters)
+    kmeans_score = silhouette_score(X, kmeans_clusters)
     return kmeans_score, symnmf_score
 
 
-def run_algos():
- 
-    data = data.tolist()
-    H = symnmf.execute_goal(data,N,k_val,d,"symnmf")
-    symnmf_clusters = get_clusters(H) 
-
-    symnmf_score = silhouette_samples(data, symnmf_clusters)
-    print(symnmf_score)
-
-
-def get_symnmf_clusters(H) -> list[int]:
+def get_symnmf_clusters(X, N, k, d) -> list[int]:
     """
     uses the symnmf module to get H, returns a list of cluster assignments for each data point.
     Each entry in the returned list corresponds to a data point and contains the index of the cluster it belongs to (0-based).
     @param H: The H matrix as a numpy array.
     @return: A list of cluster assignments for each data point.
     """
-    H = 
+    X = X.tolist()
+    H = symnmf.execute_goal(X,N,k,d,"symnmf")
     return np.argmax(H, axis=1).tolist()
 
 if __name__ == "__main__":
-    data, N, k_val, d = read_input()
-    data = data.tolist()
-    kmenas_score ,  symnmf_score = score_algos()
+    X, N, k, d = read_input()
+    kmeans_score ,  symnmf_score = score_algos(X, N, k, d)
     print(f"nmf: {symnmf_score}")
     print(f"kmeans: {kmeans_score}")

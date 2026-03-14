@@ -92,13 +92,12 @@ def kmeans_on_vectors(vectors, k , iter = DEFAULT_ITER):
         change = [Vector.d(Vector.centroid(clusters[i]), Vector.centroid(next_clusters[i])) for i in range(k)]
 
         if (max(change) < EPSILON):
-            return [Vector.centroid(cluster) for cluster in next_clusters]
+            return clusters
     
         clusters = next_clusters.copy()
-
         #emptying the next clusters for the next iteration
         next_clusters = [[] for i in range(k)]
-        
+    
     return clusters
 
 
@@ -113,7 +112,6 @@ def stdin_to_vectors():
 
 def data_to_vectors(data):
     """converts data matrix to vector list"""
-    
     return [Vector(coords) for coords in data]
 
 def print_output(vectors):
@@ -154,3 +152,4 @@ if __name__ == "__main__":
     clusters = main()
     res = [Vector.centroid(cluster) for cluster in clusters]
     print_output(res)
+
