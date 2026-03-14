@@ -125,16 +125,18 @@ Matrix * optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon){
         diff_matrix = matrix_subtract(next_H, curr_H);
         diff = matrix_hilbert_schmidt_norm(diff_matrix);
         matrix_free(diff_matrix);
-        if (diff < epsilon){
-            matrix_free(next_H);
-            break;
+        if (curr_H != H) {
+            matrix_free(curr_H);
         }
         curr_H = next_H;
+        if (diff < epsilon){
+            break;
+        }
     }
     return curr_H;
 }
 
-void error_and_exit() {
+void error_and_exit(void) {
     printf("An Error Has Occurred\n");
     exit(1);
 }
