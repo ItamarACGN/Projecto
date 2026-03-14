@@ -8,6 +8,9 @@ EPSILON = 1e-4
 GOALS = {"symnmf", "ddg", "sym", "norm"}
 ERROR_MSG = "An Error Has Occurred"
 
+def print_error_and_exit():
+    print (ERROR_MSG)
+    exit(1)
 
 def file_to_matrix(file_name):
     """
@@ -58,19 +61,18 @@ def read_input():
 
     # 3. Validate Goal
     if raw_goal not in GOALS:
-        print("An Error Has Occurred")
-        return None
+        exit(1)
     
     # 4. file reading using helper function
     data, N, d = file_to_matrix(raw_file)
     if data is None:
         # file_to_matrix already printed a more specific message when possible
-        return None
+        exit(1)
     
     # 5. Validate K - needs to be positive int less than N
     if not raw_k.isdigit() or int(raw_k) <= 0 or int(raw_k) >= N:
         #print(f"{line}")
-        return None
+        exit(1)
     k_val = int(raw_k)
     return data, N, k_val, d, raw_goal
 
