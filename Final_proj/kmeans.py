@@ -10,21 +10,21 @@ MAX_ITER = 800
 
 class Vector:
 
-    def __init__(self, data):
+    def __init__(self, data : list[float]):
         self.vector = tuple(data)
         self.dim = len(data)
 
-    def __sub__(self, other):
+    def __sub__(self, other : "Vector") -> "Vector":
         return Vector([self.vector[i] - other.vector[i] for i in range(self.dim)])
 
-    def __add__(self, other):
+    def __add__(self, other : "Vector") -> "Vector":
         return Vector([self.vector[i] + other.vector[i] for i in range(self.dim)])
 
-    def __mul__(self, other):
+    def __mul__(self, other : "Vector") -> float:
         """scaler multiplication"""
         return sum([self.vector[i] * other.vector[i] for i in range(self.dim)])
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         returns a string of the vector - (x, y, z, ....)
         """
@@ -41,21 +41,21 @@ class Vector:
         return Vector([x / scaler for x in self.vector])
 
     @staticmethod
-    def norm(v):
+    def norm(v : "Vector") -> float:
         """
         returns the L2 norm of the vector
         """
         return math.sqrt(v * v)
 
     @staticmethod
-    def d(v1, v2):
+    def d(v1 : "Vector", v2 : "Vector") -> float:
         """
         return the euclidean distance of two vectors with the same dimantion
         """
         return Vector.norm(v1 - v2)
 
     @staticmethod
-    def centroid(cluster):
+    def centroid(cluster: list["Vector"]) -> "Vector":
         """claculates the center of mass of a cluster - a list of vectors"""
         sum = Vector([0] * cluster[0].dim)
         for v in cluster:

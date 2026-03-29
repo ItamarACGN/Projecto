@@ -16,7 +16,7 @@ def print_error_and_exit():
 
 def file_to_matrix(file_name: str):
     """
-    Reads The input file name and converts it to a numpy array if valid.
+    Reads The input file name and converts the data in it to a numpy array if valid.
 
     :param file_name: the input file to read
     :type file_name: str
@@ -46,8 +46,7 @@ def file_to_matrix(file_name: str):
 
 def read_input():
     """
-    reads all the input args interprets them and returns the parameters for the algorithm,
-    if the args a re not in right format it exit printing an error has occurred
+    reads all the input args interprets them and returns the parameters for the algorithm.
 
     :returns:
         * **data** - a matrix of the given data points
