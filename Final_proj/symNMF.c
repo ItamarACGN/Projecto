@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string.h>
 
+/* Initialize a new Vector */
 double initVector(struct Vector *v, int d) {
     v->values = (double *)malloc(d * sizeof(double));
     if (v->values == NULL) {
@@ -13,6 +14,7 @@ double initVector(struct Vector *v, int d) {
     return 0;
 }
 
+/*Get the similarity matrix A using the formula A[i][j] = exp(-d(v[i],v[j])^2/2) */
 Matrix* sym(struct Vector *v, int n, int d){
     int i,j;
     Matrix *result;
@@ -32,6 +34,7 @@ Matrix* sym(struct Vector *v, int n, int d){
     return result;
 }
 
+/*Get the degree matrix D using the formula D[i][i] = sum(A[i][j]) for all j */
 Matrix* ddg(struct Vector *v, int n, int d){
     int i,j;
     Matrix *result, *symMatrix;
@@ -53,6 +56,7 @@ Matrix* ddg(struct Vector *v, int n, int d){
     return result;
 }
 
+/*Get the normalized matrix W using the formula W = D^(-1/2) * A * D^(-1/2) */
 Matrix* norm(struct Vector *v, int n, int d){
     int i;
     Matrix *normMatrix, *temp, *ddgMatrix, *symMatrix;
@@ -89,6 +93,7 @@ Matrix* norm(struct Vector *v, int n, int d){
     return normMatrix;
 }
 
+/*Get H_(t+1) from H_t = curr_H using the formula described in the assignment*/
 Matrix * update_H (Matrix * curr_H, Matrix * W){
     int i,j;
     double beta,val;
@@ -115,6 +120,7 @@ Matrix * update_H (Matrix * curr_H, Matrix * W){
     return next_H;
 }
 
+/*Get the optimized matrix H given an initial (random) matrix H_0=H*/
 Matrix * optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon){
     int iter;
     Matrix *curr_H, *next_H, *diff_matrix;
@@ -141,6 +147,7 @@ void error_and_exit(void) {
     exit(1);
 }
 
+/*Get the dimension of the vectors and the number of vectors from the file*/
 void find_rows_cols(const char *file_name, int *rows_out, int *cols_out) {
     int rows = 0, cols = 0, c;
     double val;
@@ -165,6 +172,7 @@ void find_rows_cols(const char *file_name, int *rows_out, int *cols_out) {
     *cols_out = cols;
 }
 
+/*Get n,d and the vectors from the file*/
 struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
     int rows = 0,cols = 0,i,j;
     double val;
@@ -181,7 +189,7 @@ struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
         fclose(f);
         error_and_exit();
     }
-
+    /*Read the vectors*/
     for (i = 0; i < rows; i++) {
         v[i].values = (double*)malloc(cols * sizeof(double));
         
@@ -204,7 +212,7 @@ struct Vector* read_file(const char *file_name, int *n_out, int *d_out) {
     return v;
 }
 
-/* Process vectors based on goal and execute corresponding action */
+/*Read the goal and execute the corresponding function*/
 Matrix* execute_goal(struct Vector *v, int n, int d, const char *goal) {
     if(strcmp(goal, "sym") == 0) {
         return sym(v, n, d);
@@ -218,6 +226,7 @@ Matrix* execute_goal(struct Vector *v, int n, int d, const char *goal) {
     }
 }
 
+/*Read input, execute goal, and print result */
 int main(int argc, char *argv[]) {
     char *file_name;
     int n, d;
@@ -236,6 +245,7 @@ int main(int argc, char *argv[]) {
 
     result = execute_goal(v, n, d, argv[1]);
     
+    /*Print the result and free the memory */
     if (result != NULL) {
         matrix_print(result);
         matrix_free(result);
