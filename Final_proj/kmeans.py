@@ -68,20 +68,14 @@ def kmeans_on_vectors(
 ) -> list[list[Vector]]:
     """
     performs the kmeans algorithm on a list of vectors
-
     :param vectors: a list of vector objects with the same dimensions
-    :type vectors: list[Vector]
     :param k: the number of clusters
-    :type k: int
     :param iter: the maximum amount of iterations to do
-    :type iter: int
     :returns: a list of the resulting clusters
-    :rtype: list[list[Vector]]
     """
     # initialazing clusters:
     clusters = [[vectors[i]] for i in range(k)]
     next_clusters = [[] for i in range(k)]
-
     for i in range(iter):
         centroids = [Vector.centroid(cluster) for cluster in clusters]
         for v in vectors:
@@ -91,7 +85,6 @@ def kmeans_on_vectors(
             id_min = distances.index(min(distances))
             # adding the vector to the closest cluster
             next_clusters[id_min].append(v)
-
         # if one of the clusters is empty we transfer a data point to it:
         for cluster in next_clusters:
             if len(cluster) == 0:
@@ -102,20 +95,13 @@ def kmeans_on_vectors(
                         clusters[j] = clusters[j][1:]
                         cluster.append(v)
                         break
-
         # checking the deltas of the centroids
-        change = [
-            Vector.d(Vector.centroid(clusters[i]), Vector.centroid(next_clusters[i]))
-            for i in range(k)
-        ]
-
+        change = [Vector.d(Vector.centroid(clusters[i]), Vector.centroid(next_clusters[i]))for i in range(k)]
         if max(change) < EPSILON:
             return clusters
-
         clusters = next_clusters.copy()
         # emptying the next clusters for the next iteration
         next_clusters = [[] for i in range(k)]
-
     return clusters
 
 
@@ -123,7 +109,6 @@ def stdin_to_vectors() -> list[Vector]:
     """
     takes the input from stdin and converts it to a list of vectors
     :returns: a list of vectors that wes given through standard input
-    :type: list[Vector]
     """
     vectors = []
     for line in stdin:
@@ -144,7 +129,6 @@ def print_output(vectors: list[Vector]):
     prints the vectors in the asked format
 
     :param vectors:
-    :type: list[Vector]
     """
     for v in vectors:
         print(str(v)[1:-1])
