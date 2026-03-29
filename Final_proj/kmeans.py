@@ -14,10 +14,10 @@ class Vector:
         self.vector = tuple(data)
         self.dim = len(data)
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> Vector:
         return Vector([self.vector[i] - other.vector[i] for i in range(self.dim)])
 
-    def __add__(self, other):
+    def __add__(self, other) -> Vector:
         return Vector([self.vector[i] + other.vector[i] for i in range(self.dim)])
 
     def __mul__(self, other):
@@ -63,7 +63,9 @@ class Vector:
         return sum / len(cluster)
 
 
-def kmeans_on_vectors(vectors: list[Vector], k: int, iter: int = DEFAULT_ITER):
+def kmeans_on_vectors(
+    vectors: list[Vector], k: int, iter: int = DEFAULT_ITER
+) -> list[list[Vector]]:
     """
     performs the kmeans algorithm on a list of vectors
 
@@ -73,6 +75,8 @@ def kmeans_on_vectors(vectors: list[Vector], k: int, iter: int = DEFAULT_ITER):
     :type k: int
     :param iter: the maximum amount of iterations to do
     :type iter: int
+    :returns: a list of the resulting clusters
+    :rtype: list[list[Vector]]
     """
     # initialazing clusters:
     clusters = [[vectors[i]] for i in range(k)]
