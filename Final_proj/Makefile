@@ -1,7 +1,5 @@
 CC = gcc
 
-#REMOVE the -g flag before we submit
-
 CFLAGS = -ansi -Wall -Wextra -Werror -pedantic-errors
 LDFLAGS = -lm
 
