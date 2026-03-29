@@ -82,7 +82,7 @@ def read_input():
     return data, N, k_val, d, raw_goal
 
 
-def init_H(W: NDArray[float64], n: int, k: int):
+def init_H(W: np.ndarray[np.float64], n: int, k: int):
     """
     Initializes the H (n by k) matrix randomly according to instructions.
     ( each value is chosen uniformly at random from the range [0, 2*sqrt(m/k)] where m is the mean of all elements in W).
