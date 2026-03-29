@@ -63,7 +63,9 @@ class Vector:
         return sum / len(cluster)
 
 
-def kmeans_on_vectors(vectors: list[Vector], k: int, iter: int = DEFAULT_ITER):
+def kmeans_on_vectors(
+    vectors: list[Vector], k: int, iter: int = DEFAULT_ITER
+) -> list[list[Vector]]:
     """
     performs the kmeans algorithm on a list of vectors
 
@@ -73,6 +75,8 @@ def kmeans_on_vectors(vectors: list[Vector], k: int, iter: int = DEFAULT_ITER):
     :type k: int
     :param iter: the maximum amount of iterations to do
     :type iter: int
+    :returns: a list of the resulting clusters
+    :rtype: list[list[Vector]]
     """
     # initialazing clusters:
     clusters = [[vectors[i]] for i in range(k)]
@@ -115,7 +119,7 @@ def kmeans_on_vectors(vectors: list[Vector], k: int, iter: int = DEFAULT_ITER):
     return clusters
 
 
-def stdin_to_vectors():
+def stdin_to_vectors() -> list[Vector]:
     """
     takes the input from stdin and converts it to a list of vectors
     :returns: a list of vectors that wes given through standard input
@@ -130,7 +134,7 @@ def stdin_to_vectors():
     return vectors
 
 
-def data_to_vectors(data):
+def data_to_vectors(data: list[list[float]]) -> list[Vector]:
     """converts data matrix to vector list"""
     return [Vector(coords) for coords in data]
 
@@ -146,7 +150,7 @@ def print_output(vectors: list[Vector]):
         print(str(v)[1:-1])
 
 
-def main():
+def main() -> list[list[Vector]]:
     """
     performs the main logic reading all the args given and retuning the clusters calculated by the kmeans algorithm
     """

@@ -36,26 +36,35 @@ def read_input() -> tuple[np.ndarray, int, int, int]:
     return data, N, k_val, d
 
 
-def get_kmeans_clusters(X : np.ndarray, k: int) -> np.ndarray:
+def get_kmeans_clusters(X: np.ndarray, k: int) -> np.ndarray:
     """
-    Gets the cluster assignments for each data point using K-means.
-    @param X: The input data.
-    @param k: The number of clusters.
-    @return: A numpy array of cluster assignments for each data point.
+    uses the kmeans from HW1 to cluster and returns cluster assignments for each data point using K-means.
+    :param: X: The input data.
+    :param: k: The number of clusters.
+    :return: A numpy array of cluster assignments for each data point.
     """
-    X_as_vectors = kmeans.data_to_vectors(X)
-    kmeans_clusters = kmeans.kmeans_on_vectors(X_as_vectors, k) 
-    kmeans_clusters = [[list(point.vector) for point in centroid] for centroid in kmeans_clusters] 
-    kmeans_labels = np.zeros(len(X), dtype=int)
+    X_as_vectors = kmeans.data_to_vectors(
+        X
+    )  # convets the data to a list of Vector objects used in our HW1 implementation
+    kmeans_clusters = kmeans.kmeans_on_vectors(
+        X_as_vectors, k
+    )  # performs kmeans on vectors
+    kmeans_clusters = [
+        [list(point.vector) for point in centroid] for centroid in kmeans_clusters
+    ]  # converts the vectors in each centroid to a regular tuple
+    kmeans_labels = np.zeros(len(X), dtype=int)  # label list init
     for cluster_id, cluster_vectors in enumerate(kmeans_clusters):
-        cluster_vectors = np.array(cluster_vectors)
-        # Broadcasting: Compares every row in X with every row in the cluster
-        # X[:, None, :] reshapes to (N, 1, D) to compare against (M, D)
+        # labeling:
+        cluster_vectors = np.array(
+            cluster_vectors
+        )  # converts the vector list to numpy array
         matches = (X[:, None, :] == cluster_vectors).all(axis=-1)
-        # Get the row indices in X that matched any vector in this cluster
+        # finds the corresponding datapoints in X for each vector in the cluster
         row_indices = np.any(matches, axis=1)
-        # Assign the cluster ID
-        kmeans_labels[row_indices] = cluster_id
+        # gets the index of some corresponding point as the index of the vector
+        kmeans_labels[row_indices] = (
+            cluster_id  # assign the cluster_id to the vector index to create the right label
+        )
     return kmeans_labels
 
 def score_algos(X : np.ndarray, N: int, k: int, d: int) -> tuple[float, float]:
