@@ -39,6 +39,6 @@ Matrix* sym(struct Vector *v, int n, int d); /* Compute the similarity matrix*/
 Matrix* norm(struct Vector *v, int n, int d); /* Compute the normalized similarity matrix */
 Matrix* optimize_H(Matrix * H, Matrix * W, int max_iters, double epsilon); /* Optimize H matrix using multiplicative update rules */
 void error_and_exit(void); /*prints error messege and quirs - helper*/
-Matrix* diagonal_multiply_matrix(const Matrix *Diag, const Matrix *A);
-Matrix* matrix_multiply_diagonal(const Matrix *A, const Matrix *Diag);
+Matrix* diagonal_multiply_matrix(const Matrix *Diag, const Matrix *A); /* multiplies a diagonal matrix with non diagnal */
+Matrix* matrix_multiply_diagonal(const Matrix *A, const Matrix *Diag); /* multiplies a non diagonal matrix with  diagnal */
 #endif /* CAP_H_ */

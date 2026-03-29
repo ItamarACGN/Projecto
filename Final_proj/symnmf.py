@@ -8,18 +8,21 @@ EPSILON = 1e-4
 GOALS = {"symnmf", "ddg", "sym", "norm"}
 ERROR_MSG = "An Error Has Occurred"
 
+
 def print_error_and_exit():
-    print (ERROR_MSG)
+    print(ERROR_MSG)
     exit(1)
 
-def file_to_matrix(file_name):
+
+def file_to_matrix(file_name: str):
     """
-    Reads The input file name and converts it to a numpy array if valid. 
-    @param File: A file txt file object containing the input data.
-    @return: A tuple containing the data as a numpy array, the number of rows, and the number of columns.
+    Reads The input file name and converts it to a numpy array if valid.
+
+    :param file_name: the input file to read
+    :type file_name: str
     """
     try:
-        file = open(file_name, 'r')
+        file = open(file_name, "r")
         data = []
         N = 0
         d = None  # Store the expected dimension
@@ -43,53 +46,66 @@ def file_to_matrix(file_name):
 
 def read_input():
     """
-    Proccessing the cmd arrgs and validating them. 
-    If the input is not valid we print "An Error Has Occurred" and return None.
-    @ret data - a numpy array of the points for, N - the number of points,
-    k_val - the number of clusters, d - dimensions,
-    goal -  the function to run according to the input goal.
+    reads all the input args interprets them and returns the parameters for the algorithm,
+    if the args a re not in right format it exit printing an error has occurred
+
+    :returns:
+        * **data** - a matrix of the given data points
+        * **N** - the number of data points
+        * **k_val** - the number of clusters,
+        * **d** - dimensions,
+        * **goal** -  the function to run according to the input goal.
     """
-    # 1. Validate input length
+    # Validate input length
     if len(argv) != 4:
         print_error_and_exit()
 
-    # 2. Assign variables based on input length
+    # Assign variables based on input length
     raw_k = argv[1]
     raw_goal = argv[2]
     raw_file = argv[3]
 
-    # 3. Validate Goal
+    # Validate Goal
     if raw_goal not in GOALS:
         exit(1)
-    
-    # 4. file reading using helper function
+
+    # file reading using helper function
     data, N, d = file_to_matrix(raw_file)
     if data is None:
         # file_to_matrix already printed a more specific message when possible
         exit(1)
-    
-    # 5. Validate K - needs to be positive int less than N
+
+    # Validate K - needs to be positive int less than N
     if not raw_k.isdigit() or int(raw_k) <= 0 or int(raw_k) >= N:
-        #print(f"{line}")
+        # print(f"{line}")
         exit(1)
     k_val = int(raw_k)
     return data, N, k_val, d, raw_goal
 
 
-def init_H(W, n, k):
+def init_H(W: NDArray[float64], n: int, k: int):
     """
-    Initializes the H (n by k) matrix randomly according to instractions.
+    Initializes the H (n by k) matrix randomly according to instructions.
     ( each value is chosen uniformly at random from the range [0, 2*sqrt(m/k)] where m is the mean of all elements in W).
-    @param W: The innormalized similarity matrix.
-    @param n: The number of rows in W.
-    @param k: The number of clusters.
+    :param: W: The innormalized similarity matrix.
+    :param: n: The number of rows in W.
+    :param: k: The number of clusters.
     """
     np.random.seed(1234)
     m = np.mean(W)  # Compute the mean of all elements in W
-    H = np.random.uniform(0, 2 * np.sqrt(m / k), size=(n, k)) 
+    H = np.random.uniform(0, 2 * np.sqrt(m / k), size=(n, k))
     return H
 
-def execute_goal(data, N, k_val, d, goal, max_iter = MAX_ITER, epsilon = EPSILON):
+
+def execute_goal(
+    data: list[list[float]],
+    N: int,
+    k_val: int,
+    d: int,
+    goal: str,
+    max_iter: int = MAX_ITER,
+    epsilon: float = EPSILON,
+):
     """
     Executes the given goal using the symnmf C API.
     @param data: The input data as a python list of lists.
@@ -100,27 +116,33 @@ def execute_goal(data, N, k_val, d, goal, max_iter = MAX_ITER, epsilon = EPSILON
     @return: The result of the executed goal as a numpy array or None if an error occurred.
     """
     if goal == "symnmf":
+        # computes the normalized similarity matrix using the costume c module function
         W = np.array(symnmf.execute_goal(data, N, d, "norm"))
         H = init_H(W, N, k_val)
+        # runs the symnmf function from the c module
         result = symnmf.optimize_H(H.tolist(), W.tolist(), max_iter, epsilon)
 
     else:
+        # for any other goal we just use execute goal from the module
         result = symnmf.execute_goal(data, N, d, goal)
     return np.array(result)
 
 
 def main():
+    """
+    main logic for the symnmf algo computes the given goal if input is valid
+    if the input is not valid, it prints an error message and exits
+    """
     input_data = read_input()
     if input_data is not None:
-        #print( input_data)
+        # print( input_data)
         data, N, k_val, d, goal = input_data
         result = execute_goal(data.tolist(), N, k_val, d, goal)
         return result
-        
+
+
 if __name__ == "__main__":
     result = main()
     if result is not None:
-        #TODO make sure the matrix is not transposed!!
-        np.savetxt(stdout, result, fmt="%.4f", delimiter=",")#prints the resault
-
-
+        # if we have a result we print it in the asked format
+        np.savetxt(stdout, result, fmt="%.4f", delimiter=",")

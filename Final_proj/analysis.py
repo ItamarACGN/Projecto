@@ -39,6 +39,7 @@ def read_input():
 
 
 def get_kmeans_clusters(X , k):
+    
     X_as_vectors = kmeans.data_to_vectors(X)
     kmeans_clusters = kmeans.kmeans_on_vectors(X_as_vectors, k) #gets the clusters as a list of lists of vectors
     kmeans_clusters = [[list(point.vector) for point in centroid] for centroid in kmeans_clusters] # turns the vectors inro tuples
